@@ -75,11 +75,9 @@ class QuotationController extends Controller
 
     public function getLines($quotationId)
     {
-        $quotation = Quotation::where('id', '=', $quotationId)
+        return Quotation::where('id', '=', $quotationId)
             ->with('quotationLines')
             ->first();
-
-        return $quotation;
     }
 
     public function storeQuotationLines(Request $request)
@@ -90,9 +88,7 @@ class QuotationController extends Controller
             'contents_id'  => 'required',
         ]);
 
-        $quotationLines = QuotationLines::create($attributes);
-
-        return $quotationLines;
+        return QuotationLines::create($attributes);
     }
 
     public function productIndex(product $product)
