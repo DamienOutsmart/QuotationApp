@@ -19,17 +19,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 //Functioning
-Route::get('/', [QuotationController::class, 'show']);
+Route::get('quotations/{id}', [QuotationController::class, 'show']);
 Route::post('quotations', [QuotationController::class, 'store']);
-Route::get('quotationgetlines', [QuotationController::class, 'getLines']);
+Route::get('quotationgetlines/{id}', [QuotationController::class, 'getLines']);
 Route::post('quotationlines', [QuotationController::class, 'storeQuotationLines']);
 
 Route::get('quotations', [QuotationController::class, 'index']);
 Route::get('products', [QuotationController::class, 'index']);
 
 //Work in progress
-Route::get('quotationcalculatecost', [QuotationController::class, 'calculate']);
-Route::get('quotationpreview', [QuotationController::class, 'previewQuotation']);
+Route::get('quotationcalculatecost/{id}', [QuotationController::class, 'calculateTotalPrice']);
+Route::get('quotationpreview/{id}', [QuotationController::class, 'previewQuotation']);
 
 Route::get('newquotationline', [QuotationController::class, 'storeQuotationLines']);
 Route::post('newquotationline', [QuotationController::class, 'storeQuotationLines']);

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\product;
+use App\Models\Product;
 use App\Models\Quotation;
 use App\Models\quotationLines;
 use Illuminate\Foundation\Auth\User;
@@ -13,24 +13,13 @@ use Illuminate\Support\Facades\DB;
 
 class QuotationController extends Controller
 {
-    /**
-     * Update the specified user.
-     *
-     * @param Request $request
-     * @param integer $id
-     * @return Response
-     */
-
-    //Clean this up and divide it in multiple controllers with Create, Update, Index, Show
-
-    public function index(Quotation $quotation)
+    public function index()
     {
-        return $quotation->id;
+        return Quotation::all();
     }
 
-    public function store(Request $request)
+    public function store(Request $request): Quotation
     {
-
         $attributes = $request->validate([
             'id',
             'customer_city'         => 'required',
@@ -42,27 +31,23 @@ class QuotationController extends Controller
             'customer_street'       => 'required',
             'status'                => 'required',
         ]);
+
         $attributes['user_id'] = 1;
-        $quotation = Quotation::create($attributes);
 
-        return ($quotation);
+        return Quotation::create($attributes);
     }
 
-    public function show(Request $request)
+    public function show(Quotation $quotation): Quotation
     {
-        $user = User::find($request->id = 1);
-
-        Auth::login($user);
-
-        return Quotation::all();
+        return $quotation->with('quotation_lines');
     }
 
-    public function previewQuotation($id)
+    public function previewQuotation($quotationId)
     {
         $query = DB::table('quotations')
             ->join('quotationLines', 'quotation_id', '=', 'quotations.id')
             ->join('products', 'quotationlines.contents_id', '=', 'products.id')
-            ->where('quotations.id', '=', $id)
+            ->where('quotations.id', '=', $quotationId)
             ->get();
 
         print 'previewQuotation';
@@ -70,24 +55,22 @@ class QuotationController extends Controller
         return $query;
     }
 
-    public function calculate($id)
+    public function calculateTotalPrice($quotationId)
     {
-        $queries = DB::table('products')
+        $products = DB::table('products')
             ->join('quotation_lines', 'products.id', '=', 'contents_id')
-            ->where('quotation_lines.quotation_id', '=', $id)
+            ->where('quotation_lines.quotation_id', '=', $quotationId)
             ->select('quotation_lines.quotation_id', 'quotation_lines.amount', 'products.price')
             ->get();
 
         $sumArray = [];
 
-        foreach ($queries as $query) {
-            $sumPrice = ($query->price * $query->amount);
+        foreach ($products as $product) {
+            $sumPrice = ($product->price * $product->amount);
             $sumArray[] = $sumPrice;
         }
 
-        $totalPrice = (array_sum($sumArray));
-
-        return $totalPrice;
+        return array_sum($sumArray);
     }
 
     public function getLines($quotationId)
@@ -114,6 +97,6 @@ class QuotationController extends Controller
 
     public function productIndex(product $product)
     {
-        return product::all();
+        return Product::all();
     }
 }
